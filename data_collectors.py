@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Data collection module for the Deep Equity Research System.
 
@@ -71,7 +73,7 @@ class SECCollector:
     Fetches filings metadata and XBRL financial data from SEC EDGAR.
 
     Flow:
-      1. Load company_tickers.json to map ticker -> CIK
+      1. Load company_tickers.json to map ticker → CIK
       2. Fetch submissions JSON for recent 10-K / 10-Q filing URLs
       3. Fetch XBRL companyfacts JSON for structured financials
     """
@@ -641,7 +643,7 @@ def collect_all(ticker: str) -> dict:
     This is the main entry point used by Phase 1 agents.
     """
     ticker = ticker.upper().strip()
-    logger.info("Starting data collection for %s ...", ticker)
+    logger.info("Starting data collection for %s …", ticker)
 
     sec = SECCollector()
     market = MarketDataCollector()
@@ -654,7 +656,7 @@ def collect_all(ticker: str) -> dict:
     earnings_data = {}
 
     try:
-        logger.info("[%s] Collecting SEC EDGAR data ...", ticker)
+        logger.info("[%s] Collecting SEC EDGAR data …", ticker)
         sec_data = sec.get_data(ticker)
     except Exception as e:
         logger.error("[%s] SEC collection failed: %s", ticker, e)
@@ -663,7 +665,7 @@ def collect_all(ticker: str) -> dict:
     company_name = sec_data.get("company_name", "") or ""
 
     try:
-        logger.info("[%s] Collecting market data (yfinance) ...", ticker)
+        logger.info("[%s] Collecting market data (yfinance) …", ticker)
         market_data = market.get_data(ticker)
         if not company_name:
             company_name = (
@@ -674,14 +676,14 @@ def collect_all(ticker: str) -> dict:
         market_data = {"ticker": ticker, "errors": [str(e)]}
 
     try:
-        logger.info("[%s] Collecting news ...", ticker)
+        logger.info("[%s] Collecting news …", ticker)
         news_data = news.get_data(ticker, company_name=company_name)
     except Exception as e:
         logger.error("[%s] News collection failed: %s", ticker, e)
         news_data = {"ticker": ticker, "news_items": [], "errors": [str(e)]}
 
     try:
-        logger.info("[%s] Collecting earnings data ...", ticker)
+        logger.info("[%s] Collecting earnings data …", ticker)
         earnings_data = earnings.get_data(ticker, sec_collector=None)
     except Exception as e:
         logger.error("[%s] Earnings collection failed: %s", ticker, e)

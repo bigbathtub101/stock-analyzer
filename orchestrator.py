@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Main orchestrator for the Deep Equity Research System.
 
@@ -81,22 +83,22 @@ def _banner(ticker: str, parallel: bool) -> None:
     if parallel:
         est_low = est_low // 2
         est_high = est_high // 2
-    print(f"    Estimated time: {est_low}-{est_high} minutes")
+    print(f"    Estimated time: {est_low}–{est_high} minutes")
     print(f"    Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 70)
     print()
 
 
 def _phase_header(phase_num: int, phase_name: str, agent_count: int) -> None:
-    print(f"\n{'_'*60}")
+    print(f"\n{'─'*60}")
     print(f"  PHASE {phase_num}: {phase_name.upper()}")
     print(f"  {agent_count} agent{'s' if agent_count > 1 else ''}")
-    print(f"{'_'*60}")
+    print(f"{'─'*60}")
 
 
 def _agent_line(agent_id: int, agent_name: str, status: str, elapsed: str = "") -> None:
     suffix = f"  [{elapsed}]" if elapsed else ""
-    print(f"  [{_now()}]  Agent {agent_id:02d} - {agent_name:<35} {status}{suffix}")
+    print(f"  [{_now()}]  Agent {agent_id:02d} — {agent_name:<35} {status}{suffix}")
 
 
 # ---------------------------------------------------------------------------
@@ -132,7 +134,7 @@ class AgentRunner:
         tokens = max_tokens if max_tokens is not None else agent_cfg.get("max_tokens", MAX_TOKENS_FULL)
 
         t0 = time.time()
-        _agent_line(agent_id, agent_name, "running")
+        _agent_line(agent_id, agent_name, "⟳ running")
 
         try:
             full_output, briefing = self.client.generate_with_briefing(
@@ -150,10 +152,10 @@ class AgentRunner:
         full_path = self.output_dir / f"phase{phase_num}_agent{agent_id:02d}_full.md"
         brief_path = self.output_dir / f"phase{phase_num}_agent{agent_id:02d}_briefing.md"
         _write_file(full_path, f"# Agent {agent_id}: {agent_name}\n\n{full_output}")
-        _write_file(brief_path, f"# Agent {agent_id}: {agent_name} - Briefing\n\n{briefing}")
+        _write_file(brief_path, f"# Agent {agent_id}: {agent_name} — Briefing\n\n{briefing}")
 
         elapsed = _elapsed(t0)
-        _agent_line(agent_id, agent_name, "done", elapsed)
+        _agent_line(agent_id, agent_name, "✓ done", elapsed)
         return full_output, briefing
 
 
@@ -263,8 +265,8 @@ class Orchestrator:
         """Execute all 7 phases and return the path to the final report."""
         t_start = time.time()
 
-        # -- STEP 0: Collect Data --
-        print(f"\n[{_now()}]  Collecting market data for {self.ticker} ...")
+        # ── STEP 0: Collect Data ──────────────────────────────────────────
+        print(f"\n[{_now()}]  Collecting market data for {self.ticker} …")
         t_collect = time.time()
         try:
             self.raw_data = collect_all(self.ticker)
@@ -284,7 +286,7 @@ class Orchestrator:
             json.dumps(self.raw_data, default=str, indent=2)[:2_000_000],  # cap at 2MB
         )
 
-        # -- PHASES --
+        # ── PHASES ───────────────────────────────────────────────────────
         self._run_phase_1(company_name)
         self._run_phase_2(company_name)
         self._run_phase_3(company_name)
@@ -293,13 +295,13 @@ class Orchestrator:
         self._run_phase_6(company_name)
         self._run_phase_7(company_name)
 
-        # -- FINAL REPORT --
+        # ── FINAL REPORT ──────────────────────────────────────────────────
         final_path = self._assemble_final_report(company_name)
 
         total = _elapsed(t_start)
         print()
         print("=" * 70)
-        print(f"  ANALYSIS COMPLETE  -  {self.ticker}  -  {total}")
+        print(f"  ANALYSIS COMPLETE  —  {self.ticker}  —  {total}")
         print(f"  Output: {self.output_dir}")
         print(f"  Final report: {final_path.name}")
         print(f"  API calls today: {self.client.requests_today}")
@@ -503,7 +505,7 @@ class Orchestrator:
 
         # Give Agent 26 the full Phase 6 synthesis
         phase6_results = self.phase_results.get(6, {})
-        # Agent 25 is the Final Synthesis (id=25) - find it
+        # Agent 25 is the Final Synthesis (id=25) — find it
         synthesis_full = ""
         for aid, (full, _) in phase6_results.items():
             if aid == 25:
@@ -526,12 +528,12 @@ class Orchestrator:
     # ------------------------------------------------------------------
 
     def _assemble_final_report(self, company_name: str) -> Path:
-        print(f"\n[{_now()}]  Assembling final report ...")
+        print(f"\n[{_now()}]  Assembling final report …")
 
         sections = []
         sections.append(f"# Deep Equity Research Report: {company_name} ({self.ticker})")
         sections.append(f"*Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*")
-        sections.append(f"*System: Deep Equity Research System - 26 agents, 7 phases*")
+        sections.append(f"*System: Deep Equity Research System — 26 agents, 7 phases*")
         sections.append("")
         sections.append("---")
         sections.append("")
@@ -551,9 +553,9 @@ class Orchestrator:
         sections.append("---")
         sections.append("")
 
-        # Ordered phases for report (reverse order - most important first)
+        # Ordered phases for report (reverse order — most important first)
         report_order = [
-            (7, "Executive Summary - Academic Evidence Rating"),
+            (7, "Executive Summary — Academic Evidence Rating"),
             (6, "Final Investment Synthesis"),
             (5, "Forward Intelligence"),
             (4, "Valuation Analysis"),
@@ -593,7 +595,7 @@ class Orchestrator:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Deep Equity Research System - 26-agent, 7-phase stock analysis",
+        description="Deep Equity Research System — 26-agent, 7-phase stock analysis",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

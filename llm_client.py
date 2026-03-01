@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Gemini LLM client with rate limiting, retry logic, and daily quota tracking.
 
@@ -127,7 +129,7 @@ class GeminiClient:
         prompt : str
             The full prompt to send to the model.
         temperature : float
-            Sampling temperature (0.0-1.0).
+            Sampling temperature (0.0–1.0).
         max_tokens : int
             Maximum output tokens.
 
@@ -162,7 +164,7 @@ class GeminiClient:
         Returns
         -------
         tuple[str, str]
-            (full_output, briefing) - briefing may be empty if the model did not
+            (full_output, briefing)  — briefing may be empty if the model did not
             include the marker.
         """
         augmented_prompt = self._append_briefing_instruction(prompt)
@@ -234,7 +236,7 @@ class GeminiClient:
                     time.sleep(wait)
                     continue
 
-                # Non-quota error or last attempt - re-raise
+                # Non-quota error or last attempt — re-raise
                 logger.error(
                     "LLM call failed (attempt %d/%d): %s",
                     attempt,
@@ -260,7 +262,7 @@ class GeminiClient:
             "3. States your conclusions clearly and directly.\n"
             "4. Is written so that a downstream AI agent can use it as a complete "
             "substitute for your full analysis without losing critical information.\n"
-            "5. Uses tight, dense prose - no filler, no repetition.\n"
+            "5. Uses tight, dense prose — no filler, no repetition.\n"
             "The briefing is the single most important output: downstream agents "
             "depend on it entirely."
         )
